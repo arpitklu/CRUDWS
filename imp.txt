@@ -1,0 +1,13 @@
+Virtual Environment check: 
+
+(venv) in terminal
+
+if not type in terminal:
+
+source venv/bin/activate
+
+
+to restart the venev and fastAPI server:
+
+source venv/bin/activate
+uvicorn app.main:app --reload
