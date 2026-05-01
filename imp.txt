@@ -1,5 +1,0 @@
-Virtual Environment check: 
-(venv) in terminal
-
-if not type in terminal:
-source venv/bin/activate
