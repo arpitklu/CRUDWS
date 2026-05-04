@@ -1,49 +1,34 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from .database import engine, SessionLocal
-from . import models, schemas, crud
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+from .database import engine
+from . import models
+from .routes import items
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+# app = FastAPI()
+app = FastAPI(
+    title="CRUD WS",
+    description="CRUD Web Service built using FastAPI and PostgreSQL",
+    version="1.0.0",
+    docs_url=None   
+)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # allow all 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# CREATE
-@app.post("/items", response_model=schemas.ItemResponse)
-def create(item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    return crud.create_item(db, item)
+app.include_router(items.router)
 
-# READ ALL
-@app.get("/items")
-def read_all(db: Session = Depends(get_db)):
-    return crud.get_items(db)
-
-# READ ONE
-@app.get("/items/{item_id}")
-def read_one(item_id: int, db: Session = Depends(get_db)):
-    item = crud.get_item(db, item_id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
-
-# UPDATE
-@app.put("/items/{item_id}")
-def update(item_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    updated = crud.update_item(db, item_id, item)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return updated
-
-# DELETE
-@app.delete("/items/{item_id}")
-def delete(item_id: int, db: Session = Depends(get_db)):
-    deleted = crud.delete_item(db, item_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return {"message": "Item deleted"}
+@app.get("/docs", include_in_schema=False)
+def custom_swagger_ui():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title="CRUD WS"
+    )

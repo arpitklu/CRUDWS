@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRUDWS UI</title>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #222;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+    }
+
+    body.dark {
+      --bg: #111827;
+      --card: #1f2933;
+      --text: #f9fafb;
+      --primary: #3b82f6;
+      --border: #374151;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, Arial;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: var(--card);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .row button {
+      flex: 1;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .toggle {
+      cursor: pointer;
+      font-size: 14px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    pre {
+      margin-top: 20px;
+      background: #000;
+      color: #00ff88;
+      padding: 12px;
+      border-radius: 8px;
+      overflow: auto;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="top-bar">
+    <h2>CRUDWS</h2>
+    <div class="toggle" onclick="toggleTheme()">Toggle Theme</div>
+  </div>
+
+  <input id="name" placeholder="Item Name">
+  <input id="desc" placeholder="Item Description">
+
+  <input id="itemId" placeholder="Item ID (for Get / Update / Delete)">
+
+  <!-- <div class="row">
+    <button onclick="createItem()">Create</button>
+    <button class="secondary" onclick="getItems()">Get All</button>
+  </div> -->
+
+    <div class="row">
+        <button onclick="createItem()">Create</button>
+        <button class="secondary" onclick="getItems()">Get All</button>
+    </div>
+
+<div class="row">
+  <button onclick="getItem()">Get By ID</button>
+  <button onclick="updateItem()">Update</button>
+  <button onclick="deleteItem()">Delete</button>
+</div>
+
+
+
+  <pre id="output">Output will appear here...</pre>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000/items";
+
+// Load saved theme
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+
+  if (document.body.classList.contains("dark")) {
+    localStorage.setItem("theme", "dark");
+  } else {
+    localStorage.setItem("theme", "light");
+  }
+}
+
+async function createItem() {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      description: document.getElementById("desc").value
+    })
+  });
+
+  const data = await res.json();
+  show(data);
+}
+
+async function getItems() {
+  const res = await fetch(API);
+  const data = await res.json();
+  show(data);
+}
+
+function show(data) {
+  document.getElementById("output").innerText =
+    JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
