@@ -66,11 +66,7 @@ CRUDWS/
 4. **Set up PostgreSQL database**:
    - Create a database named `crud_db`
    - Create a file named `.env` in the project root
-   - Add the database connection string to `.env` as shown below
-
-   ```env
-   DATABASE_URL=postgresql://arpit@localhost/crud_db
-   ```
+   - Add the database connection string to `.env` 
 
 5. **Run the application**:
    ```bash
